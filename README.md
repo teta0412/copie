@@ -1,4 +1,8 @@
-# Copie
+<p align="center">
+  <img src="Copie/Assets.xcassets/AppIcon.appiconset/icon-256.png" width="128" height="128" alt="Copie App Icon" />
+</p>
+
+<h1 align="center">Copie</h1>
 
 <p align="center">
   <strong>Fast, lightweight, native macOS clipboard manager built with SwiftUI.</strong>
