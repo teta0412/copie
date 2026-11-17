@@ -45,15 +45,24 @@ Copie lives in your macOS menu bar and saves readable pasteboard items locally o
 
 ## ⌨️ Shortcuts & Controls
 
-| Shortcut | Action |
+| Shortcut / Action | Action |
 | :--- | :--- |
 | **⌘⇧V** | Toggle Copie menu bar popover |
 | **⌃⇧⌘S** | Capture screen area to clipboard |
 | **↑ / ↓** | Navigate history items |
 | **Return** | Copy selected item to clipboard |
 | **Esc** | Close the popover |
+| **⌘Q** | Quit Copie |
+| **Right-click icon** | Open quick actions menu (Settings, About, Quit) |
 
 Shortcuts can be customized in **Settings** (click the gear icon in the popover).
+
+### How to Quit Copie
+You can quit Copie at any time using any of these convenient methods:
+- **Right-click (or Control-click)** the menu bar icon and select **Quit Copie**.
+- Press **⌘Q** while the Copie popover, Settings, or About window is focused.
+- Click the **Power icon** in the popover footer.
+- Open **Settings** and click the **Quit Copie** button.
 
 ---
 

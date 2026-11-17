@@ -50,6 +50,7 @@ final class AppController: NSObject, NSApplicationDelegate {
         hotKey = HotKeyManager()
         hotKey.onOpenHistory = { [weak self] in self?.togglePicker() }
         hotKey.onCaptureArea = { [weak self] in self?.captureArea() }
+        setupMainMenu()
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         statusItem.autosaveName = "com.local.Copie.statusItem"
         let menuIcon = NSImage(named: "MenuBarIcon")
@@ -59,9 +60,10 @@ final class AppController: NSObject, NSApplicationDelegate {
         statusItem.button?.image = menuIcon
         statusItem.button?.imagePosition = .imageOnly
         statusItem.button?.imageScaling = .scaleProportionallyDown
-        statusItem.button?.action = #selector(togglePickerAction)
+        statusItem.button?.sendAction(on: [.leftMouseUp, .rightMouseUp])
+        statusItem.button?.action = #selector(statusItemClicked)
         statusItem.button?.target = self
-        statusItem.button?.toolTip = "Copie — clipboard history"
+        statusItem.button?.toolTip = "Copie — clipboard history (Right-click for options)"
         statusItem.isVisible = true
         DispatchQueue.main.async { [weak self] in
             self?.statusItem.button?.needsDisplay = true
@@ -69,7 +71,12 @@ final class AppController: NSObject, NSApplicationDelegate {
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in self?.monitor.start() }
         keyboardMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            guard let self, self.pickerPopover?.isShown == true else { return event }
+            guard let self else { return event }
+            if event.modifierFlags.contains(.command) && event.charactersIgnoringModifiers == "q" {
+                NSApp.terminate(nil)
+                return nil
+            }
+            guard self.pickerPopover?.isShown == true else { return event }
             let visible = self.pickerState.filtered(self.history.entries)
             switch event.keyCode {
             case 125:
@@ -100,7 +107,82 @@ final class AppController: NSObject, NSApplicationDelegate {
         if let keyboardMonitor { NSEvent.removeMonitor(keyboardMonitor) }
     }
 
-    @objc private func togglePickerAction() { togglePicker() }
+    @objc private func statusItemClicked() {
+        let event = NSApp.currentEvent
+        if event?.type == .rightMouseUp || event?.modifierFlags.contains(.control) == true {
+            showStatusMenu()
+        } else {
+            togglePicker()
+        }
+    }
+
+    @objc private func showStatusMenu() {
+        pickerPopover?.performClose(nil)
+        let menu = NSMenu()
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let header = NSMenuItem(title: "Copie \(version)", action: nil, keyEquivalent: "")
+        header.isEnabled = false
+        menu.addItem(header)
+        menu.addItem(NSMenuItem.separator())
+
+        let openItem = NSMenuItem(title: "Open History", action: #selector(openHistoryFromMenu), keyEquivalent: "")
+        openItem.target = self
+        menu.addItem(openItem)
+
+        let captureItem = NSMenuItem(title: "Capture Screen Area", action: #selector(captureAreaFromMenu), keyEquivalent: "")
+        captureItem.target = self
+        menu.addItem(captureItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        let settingsItem = NSMenuItem(title: "Settings…", action: #selector(openSettingsFromMenu), keyEquivalent: ",")
+        settingsItem.target = self
+        menu.addItem(settingsItem)
+
+        let aboutItem = NSMenuItem(title: "About Copie", action: #selector(openAboutFromMenu), keyEquivalent: "")
+        aboutItem.target = self
+        menu.addItem(aboutItem)
+
+        menu.addItem(NSMenuItem.separator())
+
+        let quitItem = NSMenuItem(title: "Quit Copie", action: #selector(quitApp), keyEquivalent: "q")
+        quitItem.target = self
+        menu.addItem(quitItem)
+
+        statusItem.popUpMenu(menu)
+    }
+
+    @objc private func openHistoryFromMenu() { showPicker() }
+    @objc private func captureAreaFromMenu() { captureArea() }
+    @objc private func openSettingsFromMenu() { showSettings() }
+    @objc private func openAboutFromMenu() { showAbout() }
+    @objc private func quitApp() { NSApp.terminate(nil) }
+
+    private func setupMainMenu() {
+        let mainMenu = NSMenu()
+        let appMenuItem = NSMenuItem()
+        mainMenu.addItem(appMenuItem)
+        let appMenu = NSMenu()
+        appMenuItem.submenu = appMenu
+
+        let aboutItem = NSMenuItem(title: "About Copie", action: #selector(openAboutFromMenu), keyEquivalent: "")
+        aboutItem.target = self
+        appMenu.addItem(aboutItem)
+
+        appMenu.addItem(NSMenuItem.separator())
+
+        let settingsItem = NSMenuItem(title: "Settings…", action: #selector(openSettingsFromMenu), keyEquivalent: ",")
+        settingsItem.target = self
+        appMenu.addItem(settingsItem)
+
+        appMenu.addItem(NSMenuItem.separator())
+
+        let quitItem = NSMenuItem(title: "Quit Copie", action: #selector(quitApp), keyEquivalent: "q")
+        quitItem.target = self
+        appMenu.addItem(quitItem)
+
+        NSApp.mainMenu = mainMenu
+    }
 
     private func primeStatusItem() {
         guard let button = statusItem.button else { return }

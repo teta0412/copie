@@ -159,7 +159,9 @@ struct PickerView: View {
                 Button(action: onAbout) { Image(systemName: "info.circle") }
                     .help("About Copie")
                     .accessibilityLabel("About Copie")
-                Button(action: onQuit) { Image(systemName: "power") }.help("Quit Copie")
+                Button(action: onQuit) { Image(systemName: "power") }
+                    .help("Quit Copie (⌘Q)")
+                    .accessibilityLabel("Quit Copie")
         }
         .buttonStyle(.plain)
         .fixedSize(horizontal: true, vertical: false)
@@ -443,6 +445,19 @@ struct SettingsView: View {
                                     .buttonStyle(.borderless)
                                     .help("Delete item")
                                 }
+                            }
+                        }
+                    }
+
+                    settingsSection("Application") {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("Quit Copie")
+                                Text("Stop clipboard monitoring and quit the application.").font(.caption).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Button("Quit Copie", role: .destructive) {
+                                NSApp.terminate(nil)
                             }
                         }
                     }
