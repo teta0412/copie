@@ -167,12 +167,14 @@ struct PickerView: View {
 }
 
 private enum AboutDetails {
-    // Replace these placeholders with the developer's public contact details.
-    static let developerName = "Developer name not configured"
+    static let developerName = "teta0412"
+    static let repositoryURL = URL(string: "https://github.com/teta0412/copie")
+    static let issuesURL = URL(string: "https://github.com/teta0412/copie/issues")
     static let supportEmail = "ducna0412@gmail.com"
     static let coffeeURL = ""
 
     static var bugReportURL: URL? {
+        if let issuesURL { return issuesURL }
         let email = supportEmail.trimmingCharacters(in: .whitespacesAndNewlines)
         let parts = email.split(separator: "@", omittingEmptySubsequences: false)
         guard parts.count == 2, !parts[0].isEmpty, !parts[1].isEmpty,
@@ -214,7 +216,7 @@ struct AboutView: View {
             }
 
             VStack(spacing: 7) {
-                Text("DEVELOPER")
+                Text("MAINTAINER")
                     .font(.system(size: 11, weight: .bold, design: .monospaced))
                     .foregroundStyle(Palette.accent)
                 Text(AboutDetails.developerName)
@@ -225,22 +227,16 @@ struct AboutView: View {
             .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 12))
 
             HStack(spacing: 12) {
-                Button("Report a Bug") { open(AboutDetails.bugReportURL) }
+                Button("GitHub") { open(AboutDetails.repositoryURL) }
+                    .disabled(AboutDetails.repositoryURL == nil)
+                Button("Report Issue") { open(AboutDetails.bugReportURL) }
                     .disabled(AboutDetails.bugReportURL == nil)
-                Button("Buy Me a Coffee ☕") { open(AboutDetails.donationURL) }
-                    .disabled(AboutDetails.donationURL == nil)
+                if AboutDetails.donationURL != nil {
+                    Button("Coffee ☕") { open(AboutDetails.donationURL) }
+                }
             }
-            if AboutDetails.bugReportURL == nil {
-                Text("Bug report email not configured")
-                    .font(.caption)
-                    .foregroundStyle(Palette.muted)
-            } else {
-                Text(AboutDetails.supportEmail)
-                    .font(.caption)
-                    .foregroundStyle(Palette.muted)
-            }
-            if AboutDetails.donationURL == nil {
-                Text("Coffee link not configured")
+            if let repo = AboutDetails.repositoryURL {
+                Text(repo.absoluteString)
                     .font(.caption)
                     .foregroundStyle(Palette.muted)
             }

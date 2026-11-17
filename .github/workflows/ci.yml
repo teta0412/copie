@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    name: Test and Build
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Smoke Tests
+        run: zsh scripts/test-smoke.sh
+
+      - name: Build Copie (Debug)
+        run: |
+          xcodebuild \
+            -project Copie.xcodeproj \
+            -scheme Copie \
+            -configuration Debug \
+            -derivedDataPath /private/tmp/CopieCI \
+            CODE_SIGNING_ALLOWED=NO \
+            build
