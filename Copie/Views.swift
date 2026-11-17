@@ -199,12 +199,18 @@ struct AboutView: View {
     @State private var linkError: String?
 
     private var version: String {
-        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Unknown"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.4"
+    }
+
+    private var appIcon: NSImage {
+        if let icon = NSImage(named: "AppIcon") { return icon }
+        if let icon = NSApp.applicationIconImage { return icon }
+        return NSImage(systemSymbolName: "square.on.square", accessibilityDescription: "Copie") ?? NSImage()
     }
 
     var body: some View {
         VStack(spacing: 16) {
-            Image(nsImage: NSApp.applicationIconImage)
+            Image(nsImage: appIcon)
                 .resizable()
                 .interpolation(.high)
                 .frame(width: 76, height: 76)

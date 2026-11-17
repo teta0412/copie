@@ -276,19 +276,21 @@ final class AppController: NSObject, NSApplicationDelegate {
     private func showSettings() {
         pickerPopover?.performClose(nil)
         if settingsWindow == nil {
-            let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 590, height: 580), styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
+            let size = NSSize(width: 590, height: 580)
+            let window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
+                                  styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
             window.title = "Copie Settings"
             window.isReleasedWhenClosed = false
             let content = SettingsView(history: history, hotKey: hotKey)
-                .frame(width: 590, height: 580)
+                .frame(width: size.width, height: size.height)
             let host = NSHostingController(rootView: content)
-            host.sizingOptions = []
             window.contentViewController = host
-            window.contentMinSize = NSSize(width: 590, height: 580)
-            window.setContentSize(NSSize(width: 590, height: 580))
+            window.contentMinSize = size
+            window.setContentSize(size)
             window.center()
             settingsWindow = window
         }
+        settingsWindow?.orderFrontRegardless()
         settingsWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
@@ -296,17 +298,19 @@ final class AppController: NSObject, NSApplicationDelegate {
     private func showAbout() {
         pickerPopover?.performClose(nil)
         if aboutWindow == nil {
-            let size = NSSize(width: 420, height: 400)
+            let size = NSSize(width: 420, height: 420)
             let window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                                   styleMask: [.titled, .closable], backing: .buffered, defer: false)
             window.title = "About Copie"
             window.isReleasedWhenClosed = false
             let host = NSHostingController(rootView: AboutView().frame(width: size.width, height: size.height))
-            host.sizingOptions = []
             window.contentViewController = host
+            window.contentMinSize = size
+            window.setContentSize(size)
             window.center()
             aboutWindow = window
         }
+        aboutWindow?.orderFrontRegardless()
         aboutWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
